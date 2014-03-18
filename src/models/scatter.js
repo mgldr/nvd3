@@ -38,6 +38,7 @@ nv.models.scatter = function() {
     , singlePoint  = false
     , dispatch     = d3.dispatch('elementClick', 'elementMouseover', 'elementMouseout')
     , useVoronoi   = true
+    , createPoints = true // false = no points (also sets useVoronoi=false)
     ;
 
   //============================================================
@@ -352,7 +353,7 @@ nv.models.scatter = function() {
           .style('fill-opacity', .5);
 
 
-      if (onlyCircles) {
+      if (createPoints && onlyCircles) {
 
         var points = groups.selectAll('circle.nv-point')
             .data(function(d) { return d.values }, pointKey);
@@ -379,7 +380,7 @@ nv.models.scatter = function() {
             .attr('cy', function(d,i) { return nv.utils.NaNtoZero(y(getY(d,i))) })
             .attr('r', function(d,i) { return Math.sqrt(z(getSize(d,i))/Math.PI) });
 
-      } else {
+      } else if (createPoints) {
 
         var points = groups.selectAll('path.nv-point')
             .data(function(d) { return d.values });
@@ -658,6 +659,15 @@ nv.models.scatter = function() {
   chart.id = function(_) {
     if (!arguments.length) return id;
     id = _;
+    return chart;
+  };
+
+  chart.createPoints= function(_) {
+    if (!arguments.length) return createPoints;
+    createPoints = _;
+    if (createPoints === false) {
+        useVoronoi = false;
+    }
     return chart;
   };
 

@@ -21,6 +21,7 @@ nv.models.stackedArea = function() {
     , y //can be accessed via chart.yScale()
     , scatter = nv.models.scatter()
     , dispatch =  d3.dispatch('tooltipShow', 'tooltipHide', 'areaClick', 'areaMouseover', 'areaMouseout')
+    , createPoints = true // false = no points (also sets useVoronoi=false)
     ;
 
   scatter
