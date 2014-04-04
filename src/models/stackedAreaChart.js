@@ -39,6 +39,7 @@ nv.models.stackedAreaChart = function() {
     , cData = ['Stacked','Stream','Expanded']
     , controlLabels = {}
     , transitionDuration = 250
+    , showSumInTooltip = false
     ;
 
   xAxis
@@ -345,7 +346,7 @@ nv.models.stackedAreaChart = function() {
 
       interactiveLayer.dispatch.on('elementMousemove', function(e) {
           stacked.clearHighlights();
-          var singlePoint, pointIndex, pointXLocation, allData = [];
+          var singlePoint, pointIndex, pointXLocation, values_sum = 0, stacked_values_sum = 0, allData = [];
           data
           .filter(function(series, i) {
             series.seriesIndex = i;
@@ -361,6 +362,8 @@ nv.models.stackedAreaChart = function() {
 
               //If we are in 'expand' mode, use the stacked percent value instead of raw value.
               var tooltipValue = (stacked.style() == 'expand') ? point.display.y : chart.y()(point,pointIndex);
+              values_sum += tooltipValue
+              stacked_values_sum += point.display
               allData.push({
                   key: series.key,
                   value: tooltipValue,
@@ -368,6 +371,14 @@ nv.models.stackedAreaChart = function() {
                   stackedValue: point.display
               });
           });
+          if (showSumInTooltip && (stacked.style() != 'expand')) {
+            allData.push({
+                key: 'sum:',//TODO: set key with chart method ( chart.setAllValuesSumLabel('my sum localization:') )
+                value: values_sum,
+                color: null,
+                stackedValue: stacked_values_sum
+            });
+          }
 
           allData.reverse();
 
@@ -626,6 +637,12 @@ nv.models.stackedAreaChart = function() {
     if (!arguments.length) return yAxisTickFormat;
     yAxisTickFormat = _;
     return yAxis;
+  };
+
+  chart.showSumInTooltip= function(_) {
+    if (!arguments.length) return showSumInTooltip;
+    if (useInteractiveGuideline) showSumInTooltip = _;
+    return chart;
   };
 
 
